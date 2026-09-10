@@ -1,0 +1,12 @@
+[Unit]
+Description=Pull the latest built portfolio from the deploy branch
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/var/www/profile
+# deploy ブランチは毎回 force push されるため、pull ではなく fetch + reset で追う。
+ExecStart=/usr/bin/git fetch --depth 1 origin deploy
+ExecStart=/usr/bin/git reset --hard FETCH_HEAD
+ExecStart=/usr/bin/git clean -fd

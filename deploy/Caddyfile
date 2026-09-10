@@ -1,0 +1,23 @@
+# ラズパイ上の /etc/caddy/Caddyfile に配置する。
+# TLS は Cloudflare Tunnel 側で終端するので、ここは平文 HTTP で十分。
+# localhost 待ち受けにしているため、ルーターのポート開放は不要。
+# LAN の他端末からも直接見たい場合は :8080 に変える。
+
+localhost:8080 {
+	root * /var/www/profile
+	encode zstd gzip
+	file_server
+
+	# ファイル名にハッシュが入るので永久にキャッシュしてよい
+	@immutable path /_next/static/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# HTML は毎回確認させる。deploy ブランチの更新をすぐ反映するため。
+	@html path / *.html */
+	header @html Cache-Control "public, max-age=0, must-revalidate"
+
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}

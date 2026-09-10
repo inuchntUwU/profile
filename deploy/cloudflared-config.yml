@@ -1,0 +1,11 @@
+# ラズパイ上の /etc/cloudflared/config.yml に配置する。
+# <TUNNEL_ID> と <公開ホスト名> は README の手順で得た値に置き換えること。
+
+tunnel: profile
+credentials-file: /root/.cloudflared/<TUNNEL_ID>.json
+
+ingress:
+  - hostname: <公開ホスト名>
+    service: http://localhost:8080
+  # 上のどれにも当たらないリクエストは 404。ingress の最後は catch-all が必須。
+  - service: http_status:404

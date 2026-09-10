@@ -1,0 +1,54 @@
+{
+  "fetchedAt": "2026-09-10T13:00:31.273Z",
+  "user": {
+    "login": "inuchntUwU",
+    "name": null,
+    "bio": null,
+    "avatarUrl": "/avatar.png",
+    "htmlUrl": "https://github.com/inuchntUwU",
+    "followers": 1,
+    "publicRepos": 4
+  },
+  "repos": [
+    {
+      "name": "profile",
+      "description": "ポートフォリオサイト　ラズパイでhost",
+      "htmlUrl": "https://github.com/inuchntUwU/profile",
+      "homepage": null,
+      "language": null,
+      "stars": 0,
+      "topics": [],
+      "pushedAt": "2026-09-10T12:29:36Z"
+    },
+    {
+      "name": "OMUCT_foodsys",
+      "description": "WEBアプリ用リポジトリ(foodsystem)",
+      "htmlUrl": "https://github.com/inuchntUwU/OMUCT_foodsys",
+      "homepage": null,
+      "language": "JavaScript",
+      "stars": 0,
+      "topics": [],
+      "pushedAt": "2026-09-10T00:35:22Z"
+    },
+    {
+      "name": "dashboard",
+      "description": null,
+      "htmlUrl": "https://github.com/inuchntUwU/dashboard",
+      "homepage": null,
+      "language": "TypeScript",
+      "stars": 0,
+      "topics": [],
+      "pushedAt": "2026-08-27T14:01:33Z"
+    },
+    {
+      "name": "inuchntUwU",
+      "description": null,
+      "htmlUrl": "https://github.com/inuchntUwU/inuchntUwU",
+      "homepage": null,
+      "language": null,
+      "stars": 0,
+      "topics": [],
+      "pushedAt": "2026-07-27T05:50:47Z"
+    }
+  ]
+}

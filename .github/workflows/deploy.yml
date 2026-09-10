@@ -1,0 +1,57 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 21:00 UTC = 翌 06:00 JST。GitHub の情報を取り直して静的 HTML を作り直す。
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+# push と定期実行が重なっても deploy ブランチが壊れないよう直列化する。
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # scripts/fetch-github.mts をネイティブの TypeScript 実行で走らせるため 24 以上。
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint and typecheck
+        run: |
+          npx biome ci .
+          npm run typecheck
+
+      - name: Build
+        # npm run build が先に npm run data を呼ぶ。トークンを渡すとレート制限が緩和される。
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to deploy branch
+        # out/ をビルド成果物専用の使い捨てブランチとして force push する。
+        # ラズパイはこのブランチだけを浅く clone して追いかける。
+        working-directory: out
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git init -q
+          git checkout -qb deploy
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "build ${GITHUB_SHA::7} at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" deploy
