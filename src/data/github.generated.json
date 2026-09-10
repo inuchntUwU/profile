@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-10T13:00:31.273Z",
+  "fetchedAt": "2026-09-10T13:26:01.054Z",
   "user": {
     "login": "inuchntUwU",
     "name": null,
@@ -15,10 +15,10 @@
       "description": "ポートフォリオサイト　ラズパイでhost",
       "htmlUrl": "https://github.com/inuchntUwU/profile",
       "homepage": null,
-      "language": null,
+      "language": "TypeScript",
       "stars": 0,
       "topics": [],
-      "pushedAt": "2026-09-10T12:29:36Z"
+      "pushedAt": "2026-09-10T13:16:14Z"
     },
     {
       "name": "OMUCT_foodsys",

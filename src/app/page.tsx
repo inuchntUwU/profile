@@ -3,16 +3,25 @@ import { profile } from "@/data/profile";
 import { getProjects, githubUser } from "@/lib/github";
 
 /**
- * データの配線だけした骨組み。見た目はここから自由に作り替えてよい。
+ * トップページ。src/app/page.tsx というファイル名が、そのまま「/」のページになる。
  *
- *   profile        src/data/profile.ts の手書き情報（tagline / intro / links など）
- *   githubUser     GitHub から取得したプロフィール（アバター・follower 数など）
- *   getProjects()  profile.featured を先頭に並べ替えたリポジトリ一覧
+ * ここはデータの配線だけをした骨組みで、見た目はほぼ付けていない。
+ * 好きに書き換えてよい（このファイルを全部消して作り直しても問題ない）。
  *
- * shadcn/ui のプリミティブは @/components/ui から使える（card / badge / button / separator）。
- * セクションを増やすときは src/components/sections/ に切り出すと見通しがよい。
+ * 使えるデータ:
+ *   profile        src/data/profile.ts に手書きした情報（tagline / intro / links など）
+ *   githubUser     GitHub から取得したプロフィール（follower 数、アバターのパスなど）
+ *   getProjects()  リポジトリ一覧。profile.featured が先頭、残りは star の多い順
+ *
+ * 部品:
+ *   <Reveal>            スクロールでフェードインさせたい範囲を包む
+ *   @/components/ui/*   shadcn/ui のパーツ（card / badge / button / separator）
+ *
+ * セクションが育ってきたら src/components/sections/ にファイルを分けると読みやすい。
  */
 export default function Home() {
+  // このコンポーネントはサーバー側（ビルド時）で 1 回だけ実行される。
+  // なので、ここでの処理はページ表示の速さに影響しない。
   const projects = getProjects();
 
   return (
@@ -38,9 +47,17 @@ export default function Home() {
         <section id="projects">
           <h2>Projects</h2>
           <ul>
+            {/*
+              配列を .map() で並べるときは key に「他と重複しない値」が要る。
+              React が差分を見分けるのに使う。ここではリポジトリ名が一意なのでそれを使う。
+            */}
             {projects.map((project) => (
               <li key={project.name}>
                 <a href={project.htmlUrl}>{project.name}</a>
+                {/*
+                  description は未設定だと null になる。
+                  三項演算子で「あるときだけ出す」。null を返した箇所には何も描画されない。
+                */}
                 {project.description ? <span> — {project.description}</span> : null}
               </li>
             ))}

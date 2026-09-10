@@ -11,9 +11,21 @@
 ## 1. 成果物を置く
 
 ```bash
+sudo apt update
 sudo apt install -y git caddy
+```
+
+`caddy` が見つからない場合は、Caddy 公式の apt リポジトリを追加してから入れる
+（<https://caddyserver.com/docs/install#debian-ubuntu-raspbian>）。
+
+リポジトリは public なので、認証情報の設定なしに clone できる。
+
+```bash
 sudo git clone --depth 1 -b deploy https://github.com/inuchntUwU/profile.git /var/www/profile
 ```
+
+`deploy` ブランチが無いと言われたら、まだ Actions が一度も成功していない。
+先に `main` を push して Actions を完走させること。
 
 ## 2. Caddy で配信する
 
@@ -39,8 +51,12 @@ systemctl list-timers profile-sync
 
 ## 4. Cloudflare Tunnel で公開する
 
+cloudflared は apt の標準リポジトリには無い。Cloudflare の apt リポジトリを追加するか、
+arm64 向けの .deb を配布ページから入れる（<https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/>）。
+
 ```bash
-# cloudflared のインストールは Cloudflare のドキュメントに従う
+# 画面の無いラズパイで実行すると、ブラウザは開かず URL が表示される。
+# その URL を手元の PC のブラウザで開いてドメインを選ぶと認証が通る。
 cloudflared tunnel login
 cloudflared tunnel create profile          # 出力される Tunnel ID を控える
 cloudflared tunnel route dns profile <公開ホスト名>

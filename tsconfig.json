@@ -21,6 +21,9 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    // scripts/fetch-github.mts から "../src/data/profile.ts" のように
+    // 拡張子付きで import できるようにする。素の Node.js で実行するときは
+    // 拡張子の省略ができないため必要。noEmit: true のときだけ許可される設定。
     "allowImportingTsExtensions": true
   },
   "include": [

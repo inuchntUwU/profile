@@ -1,10 +1,20 @@
+# profile-sync.service を定期的に実行するためのタイマー。
+# ラズパイの /etc/systemd/system/ に置く。
+#
+# 有効化:   sudo systemctl enable --now profile-sync.timer
+# 次回実行: systemctl list-timers profile-sync
+
 [Unit]
 Description=Check the deploy branch for new builds
 
 [Timer]
+# ラズパイ起動の 2 分後に 1 回実行する。
 OnBootSec=2min
+# その後は前回の実行から 10 分ごとに繰り返す。
+# GitHub Actions のビルド完了から、最大 10 分でサイトに反映される。
 OnUnitActiveSec=10min
 Unit=profile-sync.service
 
 [Install]
+# 「タイマーを有効にする」と言われたときに、この設定が読み込まれるようにする。
 WantedBy=timers.target

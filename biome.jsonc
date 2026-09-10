@@ -1,0 +1,78 @@
+// Biome の設定。ESLint（lint）と Prettier（整形）を 1 つのツールにまとめたもの。
+// コメントを書きたいので biome.json ではなく biome.jsonc にしている（.json だとコメントで構文エラーになる）。
+//
+// 使い方:
+//   npm run check   … 問題を自動修正しながら lint と整形をかける
+//   npx biome ci .  … 修正せずチェックだけ（CI 用。Actions がこれを実行する）
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
+
+  // .gitignore に書いたパスを Biome も無視する。除外設定を二重管理しないため。
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+
+  "files": {
+    // "**" で全ファイルを対象にしたうえで、"!" 付きの行で個別に除外する。
+    "includes": [
+      "**",
+      // 自動生成物。整形しても次の npm run data で書き戻されるので触らない。
+      "!src/data/github.generated.json",
+      // shadcn が配ってきたコード。こちらで整形すると公式の更新と差分が出て面倒になる。
+      "!src/components/ui",
+      // Next.js が生成する型定義ファイル。
+      "!next-env.d.ts"
+    ]
+  },
+
+  // 整形ルール。インデントはスペース 2、1 行は 88 文字で折り返す。
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 88
+  },
+
+  "linter": {
+    "enabled": true,
+    "rules": {
+      // Biome の推奨ルールセットを土台にする。
+      "preset": "recommended",
+      // 使っていない import はエラーにする（消し忘れが積もらないように）。
+      "correctness": {
+        "noUnusedImports": "error"
+      },
+      // 型だけの import は `import type { ... }` と書かせる。
+      // こう書くとビルド時に確実に消えるので、実行時のコードに残らない。
+      "style": {
+        "useImportType": "error"
+      }
+    }
+  },
+
+  // import 文の並び順を自動で整える。
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always"
+    }
+  },
+
+  // Tailwind の @import や @theme といった独自記法を CSS パーサに認識させる。
+  // これが無いと globals.css が構文エラー扱いになる。
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}

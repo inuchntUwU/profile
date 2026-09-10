@@ -23,6 +23,25 @@ npm run check      # Biome で lint と format を適用
 npm run typecheck  # 型チェック
 ```
 
+## ファイルの役割
+
+| ファイル | 何をしているか |
+|---|---|
+| `src/data/profile.ts` | 手書きのプロフィール情報。自己紹介・リンク・`featured` |
+| `src/data/github.generated.json` | 自動生成。GitHub から取ってきた内容のスナップショット |
+| `scripts/fetch-github.mts` | 上の JSON とアバターを作るスクリプト |
+| `src/lib/github.ts` | 生成 JSON を読み、表示したい順に並べ替えて画面へ渡す |
+| `src/app/layout.tsx` | 全ページ共通の枠。フォントとタブのタイトル・OGP |
+| `src/app/page.tsx` | トップページ本体。見た目はここに書く |
+| `src/components/Reveal.tsx` | スクロールでフェードインさせる部品 |
+| `src/components/ui/` | shadcn/ui のパーツ。自分で編集しない |
+| `next.config.ts` | 静的な HTML として書き出すための設定 |
+| `biome.jsonc` | lint と整形の設定 |
+| `.github/workflows/deploy.yml` | 自動ビルドと deploy ブランチへの反映 |
+| `deploy/` | ラズパイに置く設定ファイルと手順 |
+
+各ファイルの先頭に、何をしているかのコメントを書いてある。
+
 ## 編集する場所
 
 日常的に触るのは次の 2 つ。

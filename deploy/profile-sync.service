@@ -1,12 +1,26 @@
+# ビルド済みサイトを GitHub から取り込む作業の定義。
+# ラズパイの /etc/systemd/system/ に置く。
+#
+# これ単体では実行されない。同じ名前の .timer が定期的に呼び出す。
+# 手動で 1 回動かしたいときは: sudo systemctl start profile-sync
+
 [Unit]
 Description=Pull the latest built portfolio from the deploy branch
+# ネットワークが繋がってから実行する。起動直後に走って失敗するのを防ぐ。
 After=network-online.target
 Wants=network-online.target
 
 [Service]
+# oneshot = 実行して終わったら終了するタイプ。常駐しない。
 Type=oneshot
 WorkingDirectory=/var/www/profile
-# deploy ブランチは毎回 force push されるため、pull ではなく fetch + reset で追う。
+
+# deploy ブランチは GitHub Actions が毎回「強制上書き」で作り直している。
+# git pull は履歴が繋がっている前提なので、こういうブランチには使えない。
+# 代わりに「取ってくる → 手元を取ってきた内容に強制的に合わせる」の 2 段階で追いかける。
+#
+# --depth 1 は最新の 1 件だけ取る指定。過去の履歴は不要なので通信量とディスクを節約できる。
 ExecStart=/usr/bin/git fetch --depth 1 origin deploy
 ExecStart=/usr/bin/git reset --hard FETCH_HEAD
+# 前回あって今回消えたファイルを削除する。reset --hard だけでは残ってしまうため。
 ExecStart=/usr/bin/git clean -fd

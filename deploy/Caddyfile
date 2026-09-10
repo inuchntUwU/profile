@@ -1,21 +1,39 @@
-# ラズパイ上の /etc/caddy/Caddyfile に配置する。
-# TLS は Cloudflare Tunnel 側で終端するので、ここは平文 HTTP で十分。
-# localhost 待ち受けにしているため、ルーターのポート開放は不要。
-# LAN の他端末からも直接見たい場合は :8080 に変える。
+# Caddy（ウェブサーバー）の設定。ラズパイの /etc/caddy/Caddyfile に置く。
+#
+# やっているのは「/var/www/profile の中のファイルをそのまま返す」ことだけ。
+# HTML はビルド済みなので、サーバー側で組み立てる処理は一切ない。
+#
+# https の暗号化は Cloudflare Tunnel 側が担当するため、ここは平文の http でよい。
+# localhost:8080 は「このマシンの中からしか繋げない」という意味。
+# 同じマシンで動く cloudflared だけが繋ぎに来るので、これで足りる。
+# LAN の他の端末からも直接見たい場合だけ :8080 に書き換える。
 
 localhost:8080 {
+	# 配信するファイルが置いてある場所。
 	root * /var/www/profile
+
+	# 転送量を減らすため圧縮して送る。zstd が使えないブラウザには gzip で返す。
 	encode zstd gzip
+
+	# 実際にファイルを返す指示。
+	# ディレクトリを指定されたら中の index.html を返す動きが標準で入っている。
+	# next.config.ts の trailingSlash: true はこの動きに合わせるための設定。
 	file_server
 
-	# ファイル名にハッシュが入るので永久にキャッシュしてよい
+	# @名前 で「条件」に名前を付け、次の行でその条件に当てはまるものだけに設定を効かせる。
+
+	# /_next/static/ の中はファイル名にハッシュが入っていて、
+	# 中身が変わればファイル名も変わる。つまり同じ名前なら中身は絶対に同じなので、
+	# 1 年間キャッシュさせてよい（immutable = もう変わらない、の意味）。
 	@immutable path /_next/static/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
-	# HTML は毎回確認させる。deploy ブランチの更新をすぐ反映するため。
+	# HTML はファイル名が変わらないので、キャッシュされると更新が届かなくなる。
+	# max-age=0, must-revalidate で「毎回サーバーに確認してから使う」ようにする。
 	@html path / *.html */
 	header @html Cache-Control "public, max-age=0, must-revalidate"
 
+	# 存在しない URL を開かれたときに、Next.js が作った 404 ページを返す。
 	handle_errors {
 		rewrite * /404.html
 		file_server

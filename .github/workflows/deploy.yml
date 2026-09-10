@@ -1,57 +1,89 @@
+# GitHub 上で自動的にサイトをビルドし、成果物を deploy ブランチに置くための設定。
+# このファイルを .github/workflows/ に置いておくだけで GitHub が読み取って実行してくれる。
+# 実行の様子はリポジトリの "Actions" タブで見られる。
+
 name: Build and deploy
 
+# いつ実行するか。3 つの条件のどれかを満たしたら動く。
 on:
+  # 1. main ブランチに push したとき
   push:
     branches: [main]
+
+  # 2. 決まった時刻に定期実行（GitHub の情報を取り直すため）
   schedule:
-    # 21:00 UTC = 翌 06:00 JST。GitHub の情報を取り直して静的 HTML を作り直す。
+    # 書式は「分 時 日 月 曜日」。時刻は UTC なので日本時間より 9 時間遅れている。
+    # 21:00 UTC = 翌日の 06:00 JST。
     - cron: "0 21 * * *"
+
+  # 3. Actions タブから手動で実行したとき（"Run workflow" ボタンが出るようになる）
   workflow_dispatch:
 
-# push と定期実行が重なっても deploy ブランチが壊れないよう直列化する。
+# 同じグループの実行を同時に走らせない。
+# push と定期実行がたまたま重なったときに、2 つが同時に deploy ブランチを
+# 書き換えて壊れるのを防ぐ。cancel-in-progress: false は
+# 「先に動いているものを止めず、終わるまで待つ」という意味。
 concurrency:
   group: deploy
   cancel-in-progress: false
 
+# このワークフローに与える権限。deploy ブランチへ push するので書き込み権限が要る。
+# 必要な分だけ与えるのが安全（既定は読み取りのみ）。
 permissions:
   contents: write
 
 jobs:
   build:
+    # GitHub が用意する使い捨ての Ubuntu マシンで実行する。毎回まっさらな状態から始まる。
     runs-on: ubuntu-latest
+
     steps:
+      # リポジトリの中身をこのマシンに持ってくる。これが無いと何もファイルが無い。
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          # scripts/fetch-github.mts をネイティブの TypeScript 実行で走らせるため 24 以上。
+          # scripts/fetch-github.mts を変換ツール無しで実行するために 24 以上が必要。
           node-version: 24
+          # 依存パッケージをキャッシュして、2 回目以降のインストールを速くする。
           cache: npm
 
+      # package-lock.json の通りに厳密にインストールする。
+      # npm install と違ってバージョンが勝手に上がらないので、CI では ci を使う。
       - run: npm ci
 
+      # 壊れたコードがそのまま公開されないよう、ビルド前に確認する。
+      # biome ci は npm run check と違い、自動修正せずに問題があれば失敗させる。
       - name: Lint and typecheck
         run: |
           npx biome ci .
           npm run typecheck
 
       - name: Build
-        # npm run build が先に npm run data を呼ぶ。トークンを渡すとレート制限が緩和される。
+        # npm run build は中で npm run data（GitHub 取得）を先に呼ぶ。
         run: npm run build
         env:
+          # GitHub が自動で用意するトークン。設定作業は不要。
+          # 渡しておくと API の回数制限が緩くなる。
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # 出来上がった out/ の中身を deploy ブランチとして丸ごと置き換える。
+      # deploy はソースコードを置かない「成果物専用」のブランチで、
+      # ラズパイはこのブランチだけを見に来る。
       - name: Publish to deploy branch
-        # out/ をビルド成果物専用の使い捨てブランチとして force push する。
-        # ラズパイはこのブランチだけを浅く clone して追いかける。
         working-directory: out
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # out/ の中に、履歴を持たない新しいリポジトリをその場で作る。
+          # 毎回まっさらから作り直すので、前回の残骸が混ざらない。
           git init -q
           git checkout -qb deploy
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          # ${GITHUB_SHA::7} は元のコミット ID の先頭 7 文字。どの時点のビルドか後で辿れる。
           git commit -qm "build ${GITHUB_SHA::7} at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          # -f は強制上書き。deploy ブランチの履歴は毎回捨てる前提なのでこれでよい。
+          # ラズパイ側が git pull ではなく fetch + reset を使っているのはこのため。
           git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" deploy
