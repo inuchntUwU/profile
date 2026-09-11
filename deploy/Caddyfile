@@ -23,6 +23,13 @@
 	# 転送量を減らすため圧縮して送る。zstd が使えないブラウザには gzip で返す。
 	encode zstd gzip
 
+	# inuch.net（ドメインそのもの）に来たアクセスは、profile.inuch.net の同じページへ転送する。
+	# {uri} は「/tools/ などのパス部分」。付けておくと inuch.net/xxx が profile.inuch.net/xxx に飛ぶ。
+	# 302 は「一時的な転送」。301（恒久的）にするとブラウザが転送先を覚えてしまい、
+	# 将来 inuch.net で別のものを公開したくなったときに切り替えにくくなるので、あえて 302 にしている。
+	@apex host inuch.net
+	redir @apex https://profile.inuch.net{uri} 302
+
 	# 実際にファイルを返す指示。
 	# ディレクトリを指定されたら中の index.html を返す動きが標準で入っている。
 	# next.config.ts の trailingSlash: true はこの動きに合わせるための設定。

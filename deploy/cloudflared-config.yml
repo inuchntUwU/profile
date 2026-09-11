@@ -22,6 +22,10 @@ ingress:
   - hostname: profile.inuch.net
     service: http://127.0.0.1:8090
 
+  # ドメインそのもの（inuch.net）も同じ Caddy に渡す。Caddy が profile.inuch.net へ転送する。
+  - hostname: inuch.net
+    service: http://127.0.0.1:8090
+
   # どれにも当てはまらなかったリクエストの行き先。
   # 最後にこの「受け皿」を書くことが必須で、無いと cloudflared が起動に失敗する。
   - service: http_status:404

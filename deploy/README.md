@@ -3,6 +3,7 @@
 ラズパイでは **ビルドしない**。GitHub Actions が作った静的ファイルを `deploy` ブランチから
 引いてきて Caddy で配るだけなので、Node.js は不要。
 公開は Cloudflare Tunnel 経由で、URL は **https://profile.inuch.net**。
+`https://inuch.net` に来たアクセスは、Caddy が `https://profile.inuch.net` へ転送する（302）。
 
 ```
 ブラウザ → Cloudflare（https）→ Tunnel → Pi の cloudflared → Caddy（127.0.0.1:8090）→ /var/www/profile
@@ -46,6 +47,7 @@ URL が表示されるので、**手元のブラウザで開き、Cloudflare に
 ```bash
 ssh pi 'cloudflared tunnel create profile'
 ssh pi 'cloudflared tunnel route dns profile profile.inuch.net'
+ssh pi 'cloudflared tunnel route dns profile inuch.net'          # inuch.net → profile.inuch.net の転送用
 ```
 
 1 行目で表示されたトンネル ID を `cloudflared-config.yml` の `<TUNNEL_ID>` 2 か所に埋め、
