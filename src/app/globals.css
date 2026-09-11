@@ -5,6 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-brand: var(--brand);
+  /*
+    セクションのカードの影（shadow-brand クラス）。「右へ 下へ ぼかし 広がり 色」の順。
+    右下にずらしているのは、光が左上から当たっているように見せるため。
+    ぼかしを小さくすると影の輪郭がくっきりして、広がりが狭くなる。
+  */
+  --shadow-brand: 8px 8px 12px -4px var(--brand-shadow);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -46,6 +53,20 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+  差し色（アクセントカラー）。サイト中の text-brand / border-brand / bg-brand はすべてこの色になる。
+  色を変えたいときはこの 1 行だけ書き換えればよい。#rrggbb 形式でそのまま書ける。
+*/
+:root {
+  --brand: #ffcf87;
+
+  /*
+    カードの影の色。差し色に黒を混ぜて暗くしたもの。差し色を変えると影の色も自動で変わる。
+    40% を小さくするほど暗く、大きくするほど差し色に近くなる。
+  */
+  --brand-shadow: color-mix(in oklch, var(--brand) 35%, black);
 }
 
 :root {
@@ -124,8 +145,15 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* 文字をドラッグで選択したときの色 */
+  ::selection {
+    @apply bg-brand text-background;
+  }
   html {
     @apply font-sans;
+
+    /* ブラウザ標準の部品（スクロールバーなど）もダーク用の見た目にする */
+    color-scheme: dark;
 
     /*
       ヘッダーのナビ（#about など）を押したとき、瞬間移動ではなく

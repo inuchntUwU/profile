@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Noto_Sans_JP } from "next/font/google";
 import { profile } from "@/data/profile";
 // 全ページ共通の CSS。ここで 1 回読み込めば全体に効く。
 import "./globals.css";
@@ -9,14 +9,16 @@ import "./globals.css";
  * ページ本体（page.tsx）は下の {children} の位置に差し込まれる。
  */
 
-// next/font はビルド時にフォントを取得して同梱してくれる。
-// 表示のたびに Google のサーバーへ取りに行かないので速く、外部への通信も発生しない。
-// variable で CSS 変数として定義し、globals.css 側から参照できるようにしている。
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// 本文のフォント。next/font はビルド時にフォントを取得してサイトに同梱するので、
+// 表示のたびに Google へ取りに行かない（ラズパイ配信でも速い）。
+// variable の名前は globals.css の font-sans が参照する --font-sans に合わせている。
+const notoSansJp = Noto_Sans_JP({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
+// 等幅フォント。言語名や日付などの細かい情報に使う（font-mono クラス）。
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -25,13 +27,10 @@ const geistMono = Geist_Mono({
 // ブラウザのタブに出る文字や、SNS でシェアされたときのカードの内容。
 // profile.ts から引いているので、こちらを直接書き換える必要はない。
 export const metadata: Metadata = {
-  // 画像などの相対パスを絶対 URL に直すときの基準。
-  // OGP は絶対 URL でないと SNS 側が読めないため必要。
-  // profile.siteUrl が example.com のままだと間違った URL が埋まるので、公開前に直すこと。
+  // 画像などの相対パスを絶対 URL に直すときの基準。OGP は絶対 URL でないと SNS 側が読めない。
   metadataBase: new URL(profile.siteUrl),
   title: profile.handle,
   description: profile.tagline,
-  // openGraph は SNS でシェアされたときに表示されるカードの設定。
   openGraph: {
     type: "website",
     url: profile.siteUrl,
@@ -44,13 +43,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      // 日本語ページであることの宣言。読み上げソフトや翻訳の判定に使われる。
       lang="ja"
-      // 上で作ったフォントの CSS 変数を全体に適用する。
-      // antialiased は文字の輪郭を滑らかにする Tailwind のクラス。
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // dark … shadcn/ui の色をダーク用に切り替える。このサイトはダーク固定。
+      // antialiased … 文字の輪郭を滑らかにする。
+      className={`dark ${notoSansJp.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

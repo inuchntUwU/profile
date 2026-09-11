@@ -25,6 +25,22 @@ export type ProfileLink = {
   icon: string;
 };
 
+/** Tools セクションに並べるツール 1 件分 */
+export type ProfileTool = {
+  /** ツール名 */
+  name: string;
+  /** 一行の説明 */
+  description: string;
+  /** 公開先の URL。例: "https://xxx.inuch.net" */
+  href: string;
+  /**
+   * 公開状況。省略すると "live"（公開中）。
+   * "wip" にすると「開発中」の表示になり、カードはリンクにならない。
+   * 作っている途中のツールを先に予告しておきたいときに使う。
+   */
+  status?: "live" | "wip";
+};
+
 /** profile オブジェクトの形。ここに書いた項目しか使えないので、増やすときは型も足す。 */
 export type Profile = {
   /** サイト上での表示ハンドル。ページタイトルにも使われる。 */
@@ -43,7 +59,12 @@ export type Profile = {
   siteUrl: string;
   /** Hero に置く一行の紹介文 */
   tagline: string;
-  /** About セクションの本文 */
+  /**
+   * About セクションの本文。
+   * 改行したいときは " ではなく ` （バッククォート）で囲むと、書いた改行がそのまま画面に出る。
+   *   intro: `1 行目
+   *   2 行目`,
+   */
   intro: string;
   /**
    * Projects の先頭に固定表示したいリポジトリ名（GitHub 上の名前をそのまま書く）。
@@ -54,6 +75,11 @@ export type Profile = {
   featured: string[];
   /** Links セクションに並べる外部リンク */
   links: ProfileLink[];
+  /**
+   * Tools セクションに並べる、このドメインで公開しているツール。
+   * 空配列のあいだは「準備中」のカードが 1 枚だけ表示される。
+   */
+  tools: ProfileTool[];
 };
 
 export const profile: Profile = {
@@ -65,16 +91,22 @@ export const profile: Profile = {
 
   // TODO: 自己紹介を書く
   tagline: "エアプエンジニア",
-  intro:
-    "エアプエンジニアとしてAIをつかってプロダクトを作成しています。もうデザイナーのほうが近いです",
-
+  intro: "AIをつかってプロダクトを作成しています。ほぼデザイナーです",
   // TODO: 見せたいリポジトリ名を並べる。例: ["my-app", "some-tool"]
   featured: ["OMUCT_foodsys", "DisArcade"],
 
   links: [
     { label: "GitHub", href: "https://github.com/inuchntUwU", icon: "github" },
     { label: "X", href: "https://x.com/inuchnt", icon: "X" },
+    { label: "note", href: "https://note.com/inuchnt", icon: "note" },
 
     // 例: { label: "X", href: "https://x.com/...", icon: "twitter" },
+  ],
+
+  // このドメインで公開するツール。1 つ公開するごとに 1 行足す。
+  tools: [
+    { name: "ここ", description: "このサイト", href: "https://profile.inuch.net" },
+    // 例: { name: "Hoge", description: "〇〇を××するツール", href: "https://hoge.inuch.net" },
+    // 例: { name: "Fuga", description: "作っている途中", href: "https://fuga.inuch.net", status: "wip" },
   ],
 };

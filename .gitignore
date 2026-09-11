@@ -44,3 +44,7 @@ next-env.d.ts
 # API 障害やレート制限でビルドが壊れないための直近スナップショットとして使うため。
 #   src/data/github.generated.json
 #   public/avatar.*
+
+# AI エージェント向けのメモ。next dev が自動で作り直すので、リポジトリには含めない。
+AGENTS.md
+CLAUDE.md

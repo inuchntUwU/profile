@@ -51,7 +51,7 @@ npm run typecheck  # 型チェック
 
 日常的に触るのは次の 2 つ。
 
-- `src/data/profile.ts` — 自己紹介、外部リンク、`featured`（Projects の先頭に固定するリポジトリ）
+- `src/data/profile.ts` — 自己紹介、外部リンク、`featured`（Projects の先頭に固定するリポジトリ）、`tools`（このドメインで公開するツール）
 - `src/app/page.tsx` と `src/components/` — 見た目
 
 リポジトリ一覧は自動で埋まるので手で書く必要はない。
@@ -69,7 +69,7 @@ npm run typecheck  # 型チェック
 
 - `src/components/Header.tsx` の `h-20`
 - `src/components/Section.tsx` の `scroll-mt-20`
-- `src/app/page.tsx` の `pt-20`
+- `src/app/page.tsx` の `pt-28`（ヘッダーの高さ + 余白）
 
 ## GitHub のデータについて
 

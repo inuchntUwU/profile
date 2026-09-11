@@ -3,41 +3,30 @@ import { Reveal } from "@/components/Reveal";
 import type { SectionDef } from "@/data/sections";
 
 /**
- * セクション 1 つ分の器。
- *
- * ここでやっているのは「構造」だけ:
- *   - #about のような id を振る（ヘッダーのナビから飛べるようにする）
- *   - 固定ヘッダーの下に隠れないようスクロール位置をずらす
- *   - 見出しを出す
- *   - スクロールで表示されるようにする
- *
- * 枠線・余白・背景といった見た目は一切付けていない。
- * className に Tailwind のクラスを渡すか、このファイルを直接書き換えて装飾する。
+ * セクション 1 つ分のカード。About / Projects / Links はすべてこれで包んでいる。
+ * ここの見た目を変えると、全セクションにまとめて反映される。
  */
 type SectionProps = {
   section: SectionDef;
-  /** 見出しを出したくないとき（Hero など）に false */
-  showHeading?: boolean;
-  className?: string;
   children: ReactNode;
 };
 
-export function Section({
-  section,
-  showHeading = true,
-  className,
-  children,
-}: SectionProps) {
+export function Section({ section, children }: SectionProps) {
   return (
     <Reveal>
       <section
         id={section.id}
-        // scroll-mt-20 は「アンカーで飛んだとき、上に 5rem(80px) 余白を空けて止まる」指定。
-        // これが無いと、固定ヘッダーの裏に見出しが隠れてしまう。
-        // ヘッダーの高さを変えたら、この数字と Header.tsx の h-20 の両方を合わせること。
-        className={`scroll-mt-20 ${className ?? ""}`}
+        // scroll-mt-20 … ナビで飛んだとき、固定ヘッダー（80px）の下で止まるようにする
+        // rounded-2xl … 角を丸く / border … 細い枠線 / bg-card … 背景より少し明るい色
+        // p-6 sm:p-8 … 内側の余白。sm: は「画面幅 640px 以上のとき」の意味で、PC では広めに取る
+        // shadow-brand … 差し色を暗くした影を右下に落とす（globals.css で定義）
+        className="scroll-mt-20 rounded-2xl border border-border bg-card p-6 shadow-brand sm:p-8"
       >
-        {showHeading ? <h2>{section.label}</h2> : null}
+        {/* 見出し。左に差し色の短い線を引いた小さなラベルにしている。 */}
+        <h2 className="mb-6 flex items-center gap-3 text-sm font-medium uppercase tracking-widest text-brand">
+          <span className="h-px w-8 bg-brand" aria-hidden="true" />
+          {section.label}
+        </h2>
         {children}
       </section>
     </Reveal>
