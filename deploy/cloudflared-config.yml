@@ -1,23 +1,26 @@
-# Cloudflare Tunnel の設定。ラズパイの /etc/cloudflared/config.yml に置く。
+# Cloudflare Tunnel の設定の雛形。ラズパイでは /etc/cloudflared/config.yml に置かれる。
 #
 # Tunnel は、ラズパイから Cloudflare へ「外向きに」接続を張り、
 # その通り道を使って外部からのアクセスを届ける仕組み。
 # ラズパイ側でポートを開ける必要がなく、自宅のグローバル IP も相手に見えない。
 # https の証明書も Cloudflare が用意するので、こちらでの更新作業は不要。
 #
-# <TUNNEL_ID> と <公開ホスト名> は deploy/README.md の手順で得た値に置き換えること。
+# <TUNNEL_ID> は cloudflared tunnel create profile を実行したときに表示される ID。
+# 実際の設定は deploy/README.md の手順 4 で、ID を埋めたものがラズパイ上に作られる。
 
-# cloudflared tunnel create で作ったトンネルの名前。
-tunnel: profile
+# cloudflared tunnel create で作ったトンネルの ID。
+tunnel: <TUNNEL_ID>
 
-# トンネルの認証情報ファイル。作成時に自動で置かれる。
-credentials-file: /root/.cloudflared/<TUNNEL_ID>.json
+# トンネルの認証情報ファイル。deploy/setup-tunnel.sh がここへ移す。
+credentials-file: /etc/cloudflared/<TUNNEL_ID>.json
 
 # 届いたリクエストをどこへ流すかの一覧。上から順に照合される。
 ingress:
-  # このホスト名宛のアクセスを、同じマシンで動く Caddy に渡す。
-  - hostname: <公開ホスト名>
-    service: http://localhost:8080
+  # このホスト名宛のアクセスを、同じ Pi で動く Caddy に渡す。
+  # localhost ではなく 127.0.0.1 と書いているのは、Caddy の待ち受け（bind 127.0.0.1）と
+  # 確実に一致させるため。localhost だと IPv6（::1）で繋ぎに行くことがある。
+  - hostname: profile.inuch.net
+    service: http://127.0.0.1:8090
 
   # どれにも当てはまらなかったリクエストの行き先。
   # 最後にこの「受け皿」を書くことが必須で、無いと cloudflared が起動に失敗する。
