@@ -126,5 +126,23 @@
   }
   html {
     @apply font-sans;
+
+    /*
+      ヘッダーのナビ（#about など）を押したとき、瞬間移動ではなく
+      なめらかにスクロールして移動するようにする。
+      「視差効果を減らす」を有効にしている人には下のブロックで無効化する。
+    */
+    scroll-behavior: smooth;
+  }
+
+  /*
+    OS 側で「動きを減らす」設定にしている人には、なめらかスクロールを切って
+    即座に移動させる。動きで気分が悪くなる人への配慮。
+    src/components/Reveal.tsx でも同じ設定を見ている。
+  */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }

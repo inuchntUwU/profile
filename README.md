@@ -9,7 +9,7 @@ Cloudflare Tunnel 経由で公開する。
 |---|---|
 | フレームワーク | Next.js 16（App Router / `output: "export"` で完全な静的出力） |
 | 言語・UI | TypeScript / React 19 / Tailwind CSS v4 |
-| コンポーネント | shadcn/ui + lucide-react |
+| コンポーネント | shadcn/ui + lucide-react + simple-icons（ブランドロゴ） |
 | アニメーション | motion |
 | Lint / Format | Biome |
 
@@ -33,6 +33,11 @@ npm run typecheck  # 型チェック
 | `src/lib/github.ts` | 生成 JSON を読み、表示したい順に並べ替えて画面へ渡す |
 | `src/app/layout.tsx` | 全ページ共通の枠。フォントとタブのタイトル・OGP |
 | `src/app/page.tsx` | トップページ本体。見た目はここに書く |
+| `src/data/sections.ts` | セクションの一覧。ヘッダーのナビはここから自動生成される |
+| `src/components/Header.tsx` | 画面上部に固定するヘッダーとナビ |
+| `src/components/Section.tsx` | セクション 1 つ分の器。id とスクロール位置の調整 |
+| `src/components/Footer.tsx` | ページ最下部。最終更新日 |
+| `src/components/Icon.tsx` | icon 名からロゴを描画。ブランド系は simple-icons、汎用は lucide |
 | `src/components/Reveal.tsx` | スクロールでフェードインさせる部品 |
 | `src/components/ui/` | shadcn/ui のパーツ。自分で編集しない |
 | `next.config.ts` | 静的な HTML として書き出すための設定 |
@@ -50,6 +55,21 @@ npm run typecheck  # 型チェック
 - `src/app/page.tsx` と `src/components/` — 見た目
 
 リポジトリ一覧は自動で埋まるので手で書く必要はない。
+
+セクションを増やすときは `src/data/sections.ts` に足してから、`page.tsx` に `<Section>` を並べる。
+ヘッダーのナビは `sections.ts` から自動で作られるので、ナビ側の編集は不要。
+
+## 見た目について
+
+現状は**構成だけ**を組んだ状態で、配色・フォント・余白・枠線は付けていない。
+`page.tsx` と `src/components/` に付いている Tailwind のクラスは、
+固定ヘッダーの位置合わせなど「構造上どうしても必要なもの」だけに絞ってある。
+
+ヘッダーの高さを変える場合は、次の 3 か所を合わせること。
+
+- `src/components/Header.tsx` の `h-20`
+- `src/components/Section.tsx` の `scroll-mt-20`
+- `src/app/page.tsx` の `pt-20`
 
 ## GitHub のデータについて
 

@@ -61,17 +61,20 @@ export const profile: Profile = {
   githubLogin: "inuchntUwU",
 
   // TODO: 公開するドメインが決まったら差し替える
-  siteUrl: "https://example.com",
+  siteUrl: "https://profile.inuch.net",
 
   // TODO: 自己紹介を書く
-  tagline: "",
-  intro: "",
+  tagline: "エアプエンジニア",
+  intro:
+    "エアプエンジニアとしてAIをつかってプロダクトを作成しています。もうデザイナーのほうが近いです",
 
   // TODO: 見せたいリポジトリ名を並べる。例: ["my-app", "some-tool"]
-  featured: [],
+  featured: ["OMUCT_foodsys", "DisArcade"],
 
   links: [
     { label: "GitHub", href: "https://github.com/inuchntUwU", icon: "github" },
+    { label: "X", href: "https://x.com/inuchnt", icon: "X" },
+
     // 例: { label: "X", href: "https://x.com/...", icon: "twitter" },
   ],
 };
