@@ -105,8 +105,12 @@ export const profile: Profile = {
 
   // このドメインで公開するツール。1 つ公開するごとに 1 行足す。
   tools: [
-    { name: "ここ", description: "このサイト", href: "profile.inuch.net" },
-    { name: "席替えツール" ,description: "席替えの時につかえるツール", href: "reseating.inuch.net"}
+    { name: "ここ", description: "このサイト", href: "https://profile.inuch.net" },
+    {
+      name: "席替えツール",
+      description: "席替えの時につかえるツール",
+      href: "https://reseating.inuch.net",
+    },
     // 例: { name: "Hoge", description: "〇〇を××するツール", href: "https://hoge.inuch.net" },
     // 例: { name: "Fuga", description: "作っている途中", href: "https://fuga.inuch.net", status: "wip" },
   ],
